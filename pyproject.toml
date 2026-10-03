@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "kiro-proxy"
+version = "0.1.0"
+description = "OpenAI-compatible proxy for Kiro subscription models"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+keywords = ["kiro", "openai", "proxy", "llm"]
+dependencies = []
+
+[project.scripts]
+kiro-proxy = "kiro_proxy.server:main"
+
+[project.urls]
+Repository = "https://github.com/veerupandey/kiro-proxy"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/kiro_proxy"]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.0.0",
+]

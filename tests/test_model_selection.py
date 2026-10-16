@@ -1,5 +1,6 @@
 """Exercise model routing over the proxy's real HTTP boundary."""
 import json
+import io
 import threading
 import unittest
 from http.server import ThreadingHTTPServer
@@ -23,14 +24,22 @@ class ModelSelectionTests(unittest.TestCase):
         worker.start()
         try:
             with patch.object(server, "get_access_token", return_value=("fake", "us-east-1")), patch.object(server, "call_kiro", side_effect=upstream):
-                for model in ["claude-opus-4.7", "unavailable-future-model"]:
+                requested = ["claude-opus-4.7", "claude-sonnet-5.5", "claude-opus-5.5", "unavailable-future-model"]
+                for model in requested:
                     req = Request(f"http://127.0.0.1:{httpd.server_port}/v1/chat/completions",
                                   data=json.dumps({"model": model, "messages": [{"role": "user", "content": "Hello"}]}).encode(),
                                   headers={"Content-Type": "application/json"})
                     with self.assertRaises(HTTPError) as error:
                         urlopen(req, timeout=5)
                     self.assertEqual(error.exception.code, 502)
-                self.assertEqual(observed, ["claude-opus-4.7", "unavailable-future-model"])
+                self.assertEqual(observed, requested)
+                denied = HTTPError("https://upstream", 400, "Bad Request", {},
+                                   io.BytesIO(b'{"reason":"INVALID_MODEL_ID","message":"Model disabled by organization"}'))
+                with patch.object(server, "call_kiro", side_effect=denied):
+                    with self.assertRaises(HTTPError) as error:
+                        urlopen(req, timeout=5)
+                    self.assertEqual(error.exception.code, 400)
+                    self.assertIn("Model disabled by organization", error.exception.read().decode())
         finally:
             httpd.shutdown()
             httpd.server_close()

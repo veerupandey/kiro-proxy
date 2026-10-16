@@ -79,6 +79,8 @@ Add to ~/.kageha/models.yaml:
 ## Available models
 
   auto              — Kiro picks the model
+  claude-sonnet-5.5 — Experimental; requires Kiro account/organization access
+  claude-opus-5.5   — Experimental; requires Kiro account/organization access
   claude-opus-4.8
   claude-opus-4.7
   claude-opus-4.6
@@ -87,7 +89,10 @@ Add to ~/.kageha/models.yaml:
   claude-sonnet-4.5
   claude-haiku-4.5
 
-These choices passed live requests on the connected account on October 16, 2026.
+Auto and the 4.x choices passed live requests on the connected account on October
+16, 2026. The two 5.5 choices are exposed explicitly, but live requests on that
+account returned an organization access error. Adding a catalog entry cannot
+enable an entitlement at Kiro.
 Availability depends on the account and organization. New model names are sent
 upstream unchanged; unavailable or misspelled names return the upstream error
 instead of silently using Sonnet 4.6. The public Kiro catalog can include models

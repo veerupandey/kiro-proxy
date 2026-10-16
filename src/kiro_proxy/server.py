@@ -448,6 +448,9 @@ def extract_tool_use(headers, payload):
 
 MODELS = [
     {"id": "auto", "kiro": "auto"},
+    # Experimental choices may require account/organization enablement.
+    {"id": "claude-sonnet-5.5", "kiro": "claude-sonnet-5.5"},
+    {"id": "claude-opus-5.5", "kiro": "claude-opus-5.5"},
     {"id": "claude-opus-4.8", "kiro": "claude-opus-4.8"},
     {"id": "claude-opus-4.7", "kiro": "claude-opus-4.7"},
     {"id": "claude-opus-4.6", "kiro": "claude-opus-4.6"},

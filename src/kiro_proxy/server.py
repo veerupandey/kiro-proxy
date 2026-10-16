@@ -448,10 +448,13 @@ def extract_tool_use(headers, payload):
 
 MODELS = [
     {"id": "auto", "kiro": "auto"},
-    {"id": "claude-sonnet-5", "kiro": "claude-sonnet-5"},
-    {"id": "claude-sonnet-4.6", "kiro": "claude-sonnet-4.6"},
     {"id": "claude-opus-4.8", "kiro": "claude-opus-4.8"},
+    {"id": "claude-opus-4.7", "kiro": "claude-opus-4.7"},
     {"id": "claude-opus-4.6", "kiro": "claude-opus-4.6"},
+    {"id": "claude-sonnet-4.6", "kiro": "claude-sonnet-4.6"},
+    {"id": "claude-opus-4.5", "kiro": "claude-opus-4.5"},
+    {"id": "claude-sonnet-4.5", "kiro": "claude-sonnet-4.5"},
+    {"id": "claude-haiku-4.5", "kiro": "claude-haiku-4.5"},
 ]
 DEFAULT_KIRO_MODEL = "claude-sonnet-4.6"
 
@@ -511,7 +514,8 @@ class Handler(BaseHTTPRequestHandler):
         messages = req.get("messages", [])
         stream = bool(req.get("stream", False))
         model = req.get("model", "claude-sonnet-4.6")
-        kiro_model = next((m["kiro"] for m in MODELS if m["id"] == model), DEFAULT_KIRO_MODEL)
+        # Unknown names must reach upstream unchanged, never a different model.
+        kiro_model = next((m["kiro"] for m in MODELS if m["id"] == model), model)
         completion_id = f"chatcmpl-{uuid.uuid4().hex[:12]}"
 
         payload = build_conversation_state(

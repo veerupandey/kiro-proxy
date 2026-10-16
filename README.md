@@ -52,9 +52,9 @@ Add to ~/.kageha/models.yaml:
         api_key: kiro-proxy
 
     models:
-      - id: kiro/claude-sonnet-5
+      - id: kiro/claude-opus-4.7
         provider: kiro
-        name: claude-sonnet-5
+        name: claude-opus-4.7
         capabilities: [tool_calling]
         roles: [chat, agent, plan]
 
@@ -78,14 +78,20 @@ Add to ~/.kageha/models.yaml:
 
 ## Available models
 
-  auto              — Kiro picks the best model automatically
-  claude-sonnet-5   — Latest Sonnet
-  claude-sonnet-4.6 — Sonnet 4.6
-  claude-opus-4.8   — Opus 4.8
-  claude-opus-4.6   — Opus 4.6
+  auto              — Kiro picks the model
+  claude-opus-4.8
+  claude-opus-4.7
+  claude-opus-4.6
+  claude-opus-4.5
+  claude-sonnet-4.6
+  claude-sonnet-4.5
+  claude-haiku-4.5
 
-New Kiro models work automatically — just use kiro/<model-name> in your client.
-No proxy changes needed.
+These choices passed live requests on the connected account on October 16, 2026.
+Availability depends on the account and organization. New model names are sent
+upstream unchanged; unavailable or misspelled names return the upstream error
+instead of silently using Sonnet 4.6. The public Kiro catalog can include models
+that your account cannot access.
 
 ## Auto-start on login
 

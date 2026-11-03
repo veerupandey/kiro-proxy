@@ -19,15 +19,14 @@ Stdlib only. Run:  python3 server.py [--port 8787]
 import argparse
 import base64
 import json
+import os
 import sqlite3
-import struct
 import time
+import urllib.error
+import urllib.request
 import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-
-import urllib.request
-import urllib.error
 
 # ---------------------------------------------------------------------------
 # Credentials
@@ -122,7 +121,6 @@ def get_access_token():
 # Kiro API (CodeWhisperer generateAssistantResponse, event-stream protocol)
 # ---------------------------------------------------------------------------
 
-import os
 
 # Kiro IDE calls the Amazon Q Developer gateway (path-based operation, no
 # X-Amz-Target). Confirmed from kiro.rs reference implementation:
@@ -446,11 +444,18 @@ def extract_tool_use(headers, payload):
 # OpenAI facade
 # ---------------------------------------------------------------------------
 
+# Verified against the signed-in Kiro CLI catalog on 2026-11-03.
 MODELS = [
     {"id": "auto", "kiro": "auto"},
-    # Experimental choices may require account/organization enablement.
-    {"id": "claude-sonnet-5.5", "kiro": "claude-sonnet-5.5"},
     {"id": "claude-opus-5.5", "kiro": "claude-opus-5.5"},
+    {"id": "claude-sonnet-5.5", "kiro": "claude-sonnet-5.5"},
+    {"id": "claude-haiku-5.5", "kiro": "claude-haiku-5.5"},
+    {"id": "gpt-5.6-sol", "kiro": "gpt-5.6-sol"},
+    {"id": "gpt-5.6-terra", "kiro": "gpt-5.6-terra"},
+    {"id": "gpt-5.6-luna", "kiro": "gpt-5.6-luna"},
+    {"id": "kimi-k3", "kiro": "kimi-k3"},
+    {"id": "claude-opus-5", "kiro": "claude-opus-5"},
+    {"id": "claude-sonnet-5", "kiro": "claude-sonnet-5"},
     {"id": "claude-opus-4.8", "kiro": "claude-opus-4.8"},
     {"id": "claude-opus-4.7", "kiro": "claude-opus-4.7"},
     {"id": "claude-opus-4.6", "kiro": "claude-opus-4.6"},
@@ -458,6 +463,11 @@ MODELS = [
     {"id": "claude-opus-4.5", "kiro": "claude-opus-4.5"},
     {"id": "claude-sonnet-4.5", "kiro": "claude-sonnet-4.5"},
     {"id": "claude-haiku-4.5", "kiro": "claude-haiku-4.5"},
+    {"id": "deepseek-3.2", "kiro": "deepseek-3.2"},
+    {"id": "minimax-m2.5", "kiro": "minimax-m2.5"},
+    {"id": "minimax-m2.1", "kiro": "minimax-m2.1"},
+    {"id": "glm-5", "kiro": "glm-5"},
+    {"id": "qwen3-coder-next", "kiro": "qwen3-coder-next"},
 ]
 DEFAULT_KIRO_MODEL = "claude-sonnet-4.6"
 
@@ -493,6 +503,7 @@ class Handler(BaseHTTPRequestHandler):
                             "object": "model",
                             "created": int(time.time()),
                             "owned_by": "kiro",
+                            "capabilities": ["tool_calling"],
                         }
                         for m in MODELS
                     ],
@@ -516,8 +527,8 @@ class Handler(BaseHTTPRequestHandler):
 
         messages = req.get("messages", [])
         stream = bool(req.get("stream", False))
-        model = req.get("model", "claude-sonnet-4.6")
-        # Unknown names must reach upstream unchanged, never a different model.
+        model = req.get("model", DEFAULT_KIRO_MODEL)
+        # Preserve future model IDs so upstream can validate account access.
         kiro_model = next((m["kiro"] for m in MODELS if m["id"] == model), model)
         completion_id = f"chatcmpl-{uuid.uuid4().hex[:12]}"
 

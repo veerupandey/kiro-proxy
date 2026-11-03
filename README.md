@@ -78,25 +78,39 @@ Add to ~/.kageha/models.yaml:
 
 ## Available models
 
-  auto              — Kiro picks the model
-  claude-sonnet-5.5 — Experimental; requires Kiro account/organization access
-  claude-opus-5.5   — Experimental; requires Kiro account/organization access
-  claude-opus-4.8
-  claude-opus-4.7
-  claude-opus-4.6
-  claude-opus-4.5
-  claude-sonnet-4.6
-  claude-sonnet-4.5
-  claude-haiku-4.5
+The bundled catalog matches `kiro-cli chat --list-models --format json` from
+the connected account on November 3, 2026:
 
-Auto and the 4.x choices passed live requests on the connected account on October
-16, 2026. The two 5.5 choices are exposed explicitly, but live requests on that
-account returned an organization access error. Adding a catalog entry cannot
-enable an entitlement at Kiro.
-Availability depends on the account and organization. New model names are sent
-upstream unchanged; unavailable or misspelled names return the upstream error
-instead of silently using Sonnet 4.6. The public Kiro catalog can include models
-that your account cannot access.
+```text
+auto
+claude-opus-5.5
+claude-sonnet-5.5
+claude-haiku-5.5
+gpt-5.6-sol
+gpt-5.6-terra
+gpt-5.6-luna
+kimi-k3
+claude-opus-5
+claude-sonnet-5
+claude-opus-4.8
+claude-opus-4.7
+claude-opus-4.6
+claude-sonnet-4.6
+claude-opus-4.5
+claude-sonnet-4.5
+claude-haiku-4.5
+deepseek-3.2
+minimax-m2.5
+minimax-m2.1
+glm-5
+qwen3-coder-next
+```
+
+This verifies catalog visibility, not successful inference for every model.
+Availability and credit multipliers depend on your Kiro plan, profile, and
+organization. New model IDs are forwarded unchanged so Kiro can validate access;
+the proxy never silently substitutes another model. `/v1/models` reports tool
+calling support for the bundled agent models.
 
 ## Auto-start on login
 
